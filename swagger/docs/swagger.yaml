@@ -1,0 +1,746 @@
+openapi: 3.0.0
+
+info:
+  title: Consulting Project 
+  version: 0.0.1
+  description: ''
+
+
+servers:
+  - url: '{protocol}://{domain}/{version}'
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      domain:
+        enum:
+          - 127.0.0.1:3000
+          - api.staging.co.kr
+          - api.production.co.kr
+        default: 127.0.0.1:3000
+      version:
+        enum: 
+          - v1
+          - v2
+        default: v1
+
+tags:
+- name: 'user'
+  description: '유저 관련'
+# - name: 'admin'
+#   description: '어드민 관련'
+- name: 'partners'
+  description: '상담사관련'
+- name: 'keyword'
+  description: '키워드 관련'
+# - name: 'token'
+#   description: '토큰 관련'
+# - name: 'chat'
+#   description: '채팅 관련 / socket room '
+- name: 'payment'
+  description: '결제 / 거래내역 관련'
+- name: 'schedules'
+  description: '스케쥴링 관련'
+- name: 'search'
+  description: '검색 관련 API'
+
+
+
+security: 
+- ApiKeyAuth: []
+# - userApiKeyAuth: []
+# - bearerAuth: []
+
+paths:
+  /user/detail/{userId}:
+    get:
+      tags: 
+      - user
+      summary: '특정 유저 상세정보'
+      description: '1. 유저 마이페이지에서 사용'
+      parameters: 
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      security: 
+      - ApiKeyAuth: []
+      - AccessTokenAuth: []
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/200'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/user'
+                
+  /user/signup:
+    post:
+      tags: 
+      - user
+      summary: '유저 회원가입'
+      requestBody:
+        content:
+          application/json; charset:utf-8:
+            schema:
+              $ref: '#/components/schemas/user'
+      security: 
+      - ApiKeyAuth: []
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+                
+                  
+  
+  /user/singin:
+    post:
+      tags: 
+      - user
+      summary: '유저 로그인'
+      description: ' 1. JWT Refresh 관련 정보 확인 필요<br>2. 리턴 값을 어떻게 줄껀지<br>3. SNS 로그인 어떻게 할꺼니 ?'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userLogin'
+      security: 
+      - ApiKeyAuth: []
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/200'
+                - type: object
+                  properties:
+                    result:
+                      type: obejct
+                      $ref: '#/components/schemas/LoginResponse'
+  
+  /user/signout:
+    post:
+      tags: 
+      - user
+      summary: '유저 로그아웃'
+      security: 
+      - ApiKeyAuth: []
+      - AccessTokenAuth: []
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+  
+  # /partners:
+  #   get:
+  #     tags: 
+  #     - partners
+  #     summary: '상담사 정보'
+  #     parameters: 
+  #     - $ref: '#/components/parameters/pageParam'
+  #     - $ref: '#/components/parameters/sizeparam'
+  #     - $ref: '#/components/parameters/keywordParam'
+  #     - $ref: '#/components/parameters/levelParam'
+  #     - $ref: '#/components/parameters/genderParam'
+  #     - $ref: '#/components/parameters/certificateParam'
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+                
+  # /partners/detail/{partnersId}:
+  #   get:
+  #     tags: 
+  #     - partners
+  #     summary: '특정 상담사 상세정보'
+  #     parameters: 
+  #       - in: path
+  #         name: partnersId
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+
+  /partners/signup:
+    post:
+      tags:
+      - partners
+      summary: '상담사 회원가입'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/partners'
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+                
+  /partners/detail:
+    put:
+      tags: 
+      - partners
+      summary: '상당사 정보 변경 (어드민에서 사용)'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                result:
+                  type: string
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+            
+      
+      
+  
+  # /partners/signin:
+  #   post:
+  #     tags:
+  #     - partners
+  #     summary: '상담사 로그아웃'
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #               - $ref: '#/components/schemas/200'
+  #               - type: object
+  #                 properties:
+  #                   result:
+  #                     type: obejct
+  #                     $ref: '#/components/schemas/LoginResponse'
+      
+  # /partners/signout:
+  #   post:
+  #     tags:
+  #     - partners
+  #     summary: '상담사 로그아웃'
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+  /keywords:
+    get:
+      tags: 
+      - keyword
+      summary: '키워드 정보'
+      security: 
+      - ApiKeyAuth: []
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/200'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/keywords'
+  
+  /payment:
+    post:
+      tags: 
+      - payment
+      summary: 카카오톡에서 결제하고 
+      description: 카카오톡 결제 후 포인틀르 DB에 넣어준다
+      security: 
+      - ApiKeyAuth: []
+      - AccessTokenAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                to:
+                  type: integer
+                point:
+                  type: integer
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+  
+  /reservation:
+    post:
+      tags:
+      - payment
+      summary: 포인트 주고 받는 API
+      description: 문제가 왜이리 많아 userId, partnersId 어찌 구분하니 -> 차감된 금액을 반환 시켜줘야된다?
+      security: 
+      - ApiKeyAuth: []
+      - AccessTokenAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                to:
+                  type: integer
+                from:
+                  type: integer
+                point:
+                  type: integer
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+        
+  
+  # @이거는 로그인 할 때 미들웨어 에서 생성한다.
+  # /token/create:
+  #   post:
+  #     tags: 
+  #     - token
+  #     summary: '토큰 검증'
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+  
+  # @이거는 미들웨어 처리하도록 한다
+  # /token/validate:
+  #   post:
+  #     tags: 
+  #     - token
+  #     summary: '토큰 검증'
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+  
+  # @ 이거는 상담을 시작할때 한번 새롭게 만들어준다? 리프레쉬 해준다
+  # /token/refresh:
+  #   post:
+  #     tags: 
+  #     - token
+  #     summary: '토큰 리프레쉬'
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+  
+  # /review:
+  #   get:
+  #     tags: 
+  #     - review
+  #     summary: '리뷰 검색'
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+                
+  #   post:
+  #     tags: 
+  #     - review
+  #     summary: '리뷰 등록'
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+                
+  # /review/{review_id}:
+  #   get:
+  #     tags: 
+  #     - review
+  #     summary: '특정 리뷰 검색'
+  #     parameters: 
+  #     - in: path
+  #       name: review_id
+  #       required: true
+  #       schema:
+  #         type: integer
+  #     responses:
+  #       200:
+  #         description: 'success'
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/200'
+        
+  /schedules/partners/{partnersId}:
+    get:
+      tags: 
+      - schedules
+      summary: '상담사 스케쥴 일정 정보 가져오는 API'
+      description: 'patnersId? email?<br> startedAt 30분 단위로 하냐 / Range로 하냐 ?<br> 금일 00시 이후 스케쥴만 보여줘 ? 어떻게해 ? 정해줘 제발'
+      parameters: 
+      - in: path
+        name: partnersId
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: date
+        required: true
+        schema:
+          type: string
+          format: date
+      security: 
+      - ApiKeyAuth: []
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/200'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/schedules'
+
+  /schedules/partners:
+    post:
+      tags: 
+      - schedules
+      summary: '스케쥴 일정 생성 API'
+      security: 
+      - ApiKeyAuth: []
+      - AccessTokenAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schedulesObject'
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+  
+  /schedules/user:
+    post:
+      tags: 
+      - schedules
+      summary: '유저 스케쥴 확정 API'
+      description: '수정 절대 불가 절대 못 바꿔 진짜다 안된다 경고창 띄워주세요 '
+      security: 
+      - ApiKeyAuth: []
+      - AccessTokenAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/schedulesObject'
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/200'
+  
+  /search/partners:
+    get:
+      tags: 
+      - search
+      summary: '상담사 검색 정보 리스트 반환 API'
+      parameters: 
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/sizeparam'
+      - $ref: '#/components/parameters/keywordParam'
+      - $ref: '#/components/parameters/levelParam'
+      - $ref: '#/components/parameters/genderParam'
+      - $ref: '#/components/parameters/certificateParam'
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/200'
+                - type: object
+                  properties:
+                    result:
+                      type: object
+                      properties:
+                        partners:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/partners'
+                        total:
+                          type: integer
+                          example: 10
+  
+
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: True
+        name:
+          type: string
+        birth:
+          type: string
+          format: date
+        gender:
+          type: integer
+    
+    userLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        passowrd:
+          type: string
+
+    partners:
+      type: object
+      properties:
+        partnerId:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: True
+        addr:
+          type: string
+          example: 경기도 화성시 동탄대로 24길
+        name:
+          type: string
+        gender:
+          type: integer
+          example: '1 (남자: 1, 여자: 2)'
+        # addr:
+        #   type: string
+        #   example: 경기도 화성시 동탄대로 24 길
+        # info:
+        #   type: string
+        #   example: 상담사 정보
+        # level:
+        #   type: integer
+        #   example: '1 (일반: 1, 전문: 2, 마스터: 3)'
+        # certificate:
+        #   type: integer
+        #   example: '1 (1급: 1, 2급: 2)'
+      
+    
+    schedulesObject:
+      type: object
+      properties:
+        partnersId:
+          type: integer
+          example: 'email 또는 ID 또는 헤더'
+        schedules:
+          type: array
+          items:
+            type: object
+            properties:
+              scheduleId:
+                type: integer
+                example: 1
+            # example: '2020-07-02 00:00:00'
+            # type: object
+            # properties:
+            #   startedAt:
+            #     type: string
+            #     format: datetime
+            #     example: '2020-07-02 00:00:00'
+    
+    schedules:
+      type: object
+      properties:
+        schedules:
+          type: array
+          items:
+            type: object
+            properties:
+              scheduleId: 
+                type: integer
+                example: 1
+              reservation:
+                type: boolean
+              startedAt:
+                type: string
+                example: '2020-07-02 12:00:00'
+              endedAt:
+                type: string
+                example: '2020-07-02 12:30:00'
+        
+    keywords:
+      type: object
+      properties:
+        keywords:
+          type: array
+          items:
+            type: string
+          example: ['우울', '행복']
+    
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+      
+
+    200:
+      type: object
+      properties:
+        message:
+          type: string
+        result:
+          type: object
+          
+  parameters:
+    pageParam:
+      in: query
+      name: page
+      description: 페이지
+      schema:
+        type: integer
+        example: 1
+      # required: True
+      
+    sizeparam:
+      in: query
+      name: size
+      description: 페이지 당 사이즈
+      schema:
+        type: integer
+        example: 15
+      # required: True
+      
+    keywordParam:
+      in: query
+      name: keyword
+      description: 키워드
+      schema:
+        type: string
+        example: 강박
+    
+    levelParam:
+      in: query
+      name: level
+      description: 상담사 레벨 
+      schema:
+        type: integer
+        example: 1
+    
+    genderParam:
+      in: query
+      name: gender
+      description: 상담사 성별
+      schema:
+        type: integer
+        example: 1
+      
+    certificateParam:
+      in: query
+      name: certificate
+      description: 상담사 자격증
+      schema:
+        type: integer
+        example: 1
+        
+    scheduleIdParam:
+      in: query
+      name: scheduleId
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+          format: multi
+      
+    
+      
+  securitySchemes:
+    ApiKeyAuth:
+      in: header
+      type: apiKey
+      name: 'x-api-key'
+    userApiKeyAuth:
+      in: header
+      type: apiKey
+      name: 'x-api-userId'
+    AccessTokenAuth:
+      in: header
+      type: apiKey
+      name: 'x-api-accessToken'
+    
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
