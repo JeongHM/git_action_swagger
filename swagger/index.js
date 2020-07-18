@@ -23,7 +23,7 @@ const options = {
   // import swaggerDefblocinitions
   swaggerDefinition,
   // path to the API docs
-  apis: ["./docs/**/*.yaml"],
+  apis: ["./docs/*.yaml"],
 };
 // initialize swagger-jsdoc
 const swaggerSpec = swaggerJSDoc(options);
