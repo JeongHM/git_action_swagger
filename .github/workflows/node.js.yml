@@ -38,9 +38,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            export PATH=/home/ubuntu/.nvm/versions/node/v12.17.0/bin/:$PATH
-            source ~/.bashrc
+            sudo su
             cd ~/git_action_swagger
             git pull origin master
-            npm install --production
+            npm install
             pm2 restart node-app
