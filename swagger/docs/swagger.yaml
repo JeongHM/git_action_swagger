@@ -1,30 +1,30 @@
-# openapi: 3.0.0
+openapi: 3.0.0
 
-# info:
-#   title: Consulting Project 
-#   version: 0.0.1
-#   description: ''
+info:
+  title: Consulting Project 
+  version: 0.0.1
+  description: ''
 
 
-# servers:
-#   - url: '{protocol}://{domain}/{version}'
-#     variables:
-#       protocol:
-#         enum:
-#           - http
-#           - https
-#         default: https
-#       domain:
-#         enum:
-#           - 127.0.0.1:3000
-#           - api.staging.co.kr
-#           - api.production.co.kr
-#         default: 127.0.0.1:3000
-#       version:
-#         enum: 
-#           - v1
-#           - v2
-#         default: v1
+servers:
+  - url: '{protocol}://{domain}/{version}'
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      domain:
+        enum:
+          - 127.0.0.1:3000
+          - api.staging.co.kr
+          - api.production.co.kr
+        default: 127.0.0.1:3000
+      version:
+        enum: 
+          - v1
+          - v2
+        default: v1
 
 tags:
 - name: 'user'
@@ -146,6 +146,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/200'
+  
+  /user/check:
+    get:
+     tags: 
+     - user
+     summary: '유저 이메일 중복 확인'
+     security: 
+     - ApiKeyAuth: []
+     parameters: 
+     - $ref: '#/components/parameters/emailParam'
+     responses:
+      200:
+        description: 'success'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/200'
+       
   
   # /partners:
   #   get:
@@ -664,6 +682,14 @@ components:
           type: object
           
   parameters:
+    emailParam:
+      in: query
+      name: email
+      description: 이메일
+      schema:
+        type: string
+        format: email
+        
     pageParam:
       in: query
       name: page

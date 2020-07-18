@@ -12,12 +12,10 @@ const swaggerDefinition = {
   info: {
     title: "Swagger API V1", // Title of the documentation
     version: "0.1.0", // Version of the app
-    description: "", // short description of the app
+    description: "EveryThing About V1 SWAGGER TUTORIAL", // short description of the app
   },
-  servers: [ {
-    url: "http://127.0.0.1:5000/v1",
-    description: 'Local server'
-  }],
+  //   host: "blockscan.shop", // the host or url of the app
+  basePath: "/api/v1", // the basepath of your endpoint
 };
 
 // options for the swagger docs
