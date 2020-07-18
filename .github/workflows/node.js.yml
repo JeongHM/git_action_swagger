@@ -38,8 +38,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            sudo su
             cd ~/git_action_swagger
-            git pull origin master
+            sudo git pull origin master
             npm install
             pm2 restart node-app
