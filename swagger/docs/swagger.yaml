@@ -399,9 +399,8 @@ components:
           writeOnly: True
         name:
           type: string
-        birth:
-          type: string
-          format: date
+        age:
+          type: integer
         gender:
           type: integer
     
@@ -426,9 +425,6 @@ components:
         password:
           type: string
           writeOnly: True
-        addr:
-          type: string
-          example: 경기도 화성시 동탄대로 24길
         name:
           type: string
         gender:
