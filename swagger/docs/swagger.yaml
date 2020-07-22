@@ -50,14 +50,14 @@ security:
 # - bearerAuth: []
 
 paths:
-  /user/detail/{userId}:
+  /user/detail:
     get:
       tags: 
       - user
       summary: '특정 유저 상세정보'
-      description: '1. 유저 마이페이지에서 사용'
-      parameters: 
-      - $ref: '#/components/parameters/userIdParam'
+      description: '1. 유저 마이페이지에서 사용 하고 본인만 보는 것으로 userId는 JWT안에 있는 값으로 만 판별해서 내려줌'
+      # parameters: 
+      # - $ref: '#/components/parameters/userIdParam'
       security: 
       - ApiKeyAuth: []
       - AccessTokenAuth: []
@@ -73,6 +73,12 @@ paths:
                   properties:
                     result:
                       $ref: '#/components/schemas/user'
+        400:
+          $ref: '#/components/responses/badRequest'
+        401:
+          $ref: '#/components/responses/unauthorized'
+        403:
+          $ref: '#/components/responses/forbidden'
                 
   /user/signup:
     post:
@@ -87,13 +93,12 @@ paths:
       security: 
       - ApiKeyAuth: []
       responses:
-        200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/200'
-                
+        201:
+          $ref: '#/components/responses/created'
+        400:
+          $ref: '#/components/responses/badRequest'
+        401:
+          $ref: '#/components/responses/unauthorized'
                   
   
   /user/singin:
@@ -122,7 +127,11 @@ paths:
                     result:
                       type: obejct
                       $ref: '#/components/schemas/LoginResponse'
-  
+        400:
+          $ref: '#/components/responses/badRequest'
+        401:
+          $ref: '#/components/responses/unauthorized'
+          
   /user/signout:
     post:
       tags: 
@@ -133,11 +142,9 @@ paths:
       - AccessTokenAuth: []
       responses:
         200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/200'
+          $ref: '#/components/responses/success'
+        400:
+          $ref: '#/components/responses/badRequest'
   
   /user/email/check:
     get:
@@ -150,11 +157,11 @@ paths:
      - $ref: '#/components/parameters/emailParam'
      responses:
       200:
-        description: 'success'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/200'
+         $ref: '#/components/responses/success'
+      400:
+          $ref: '#/components/responses/badRequest'
+      401:
+        $ref: '#/components/responses/unauthorized'
               
   /admin/partners:
     get:
@@ -184,6 +191,12 @@ paths:
                             $ref: '#/components/schemas/partnerDetail'
                         totalCount:
                           type: integer
+        400:
+          $ref: '#/components/responses/badRequest'
+        401:
+          $ref: '#/components/responses/unauthorized'
+        403:
+          $ref: '#/components/responses/unauthorized'
                           
   /admin/partners/{partnersId}:
     put:
@@ -199,11 +212,13 @@ paths:
               $ref: '#/components/schemas/partnerDetail'
       responses:
         200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/200'
+          $ref: '#/components/responses/success'
+        400:
+          $ref: '#/components/responses/badRequest'
+        401:
+          $ref: '#/components/responses/unauthorized'
+        403:
+          $ref: '#/components/responses/unauthorized'
 
   /partners/signup:
     post:
@@ -217,11 +232,7 @@ paths:
               $ref: '#/components/schemas/partners'
       responses:
         200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/200'
+         $ref: '#/components/responses/success'
   /partners:
     get:
       tags:
@@ -290,11 +301,7 @@ paths:
               $ref: '#/components/schemas/pointCharge'
       responses:
         200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/200'
+         $ref: '#/components/responses/success'
   
   /point/send:
     post:
@@ -312,11 +319,7 @@ paths:
               $ref: '#/components/schemas/pointSend'
       responses:
         200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/200'
+         $ref: '#/components/responses/success'
                 
   /schedules/partners/{partnersId}:
     get:
@@ -357,11 +360,7 @@ paths:
               $ref: '#/components/schemas/schedulesObject'
       responses:
         200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/200'
+         $ref: '#/components/responses/success'
   
   /schedules/user:
     post:
@@ -380,13 +379,47 @@ paths:
               - $ref: '#/components/schemas/schedulesObject'
       responses:
         200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/200'
+         $ref: '#/components/responses/success'
 
 components:
+  responses:
+    success:
+      description: 'success'
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/200'
+            - $ref: '#/components/schemas/201'
+            - $ref: '#/components/schemas/400'
+    created:
+      description: 'Created'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/201'
+    badRequest:
+      description: 'Bad Request'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/400'
+    
+    unauthorized:
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/401'
+    
+    forbidden:
+      description: 'Forbidden'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/403'
+                
+      
   schemas:
     user:
       type: object
@@ -458,16 +491,14 @@ components:
           description: 상담사 키워드
           type: string
           example: 우울
+        certificate:
+          description: 자격증 급수
+          type: integer
+          example: 1
         level:
           description: 상담사 레벨
           type: integer
           example: 1
-        latitude:
-          description: 위도
-          type: integer
-        longitude:
-          description: 경도
-          type: integer
         image:
           description: S3 이미지 path
           type: string
@@ -537,12 +568,124 @@ components:
         refreshToken:
           type: string
       
-
-    200:
+    
+    
+    Success:
       type: object
+      description: OK
       properties:
         message:
           type: string
+        result:
+          type: object
+          
+    Created:
+      type: object
+      description: Created
+      properties:
+        message:
+          type: string
+          example: 요청에의해 리소스가 생성되었습니다 (회원가입 / 스케쥴 생성)
+        result:
+          type: object
+          
+    Updated:
+      type: object
+      description: Updated
+      properties:
+        message:
+          type: string
+          example: 
+        result:
+          type: object
+          
+    Empty:
+      type: object
+      description: Empty
+      properties:
+        message:
+          type: string
+          example: 
+        result:
+          type: object
+    
+    BadRequest:
+      type: object
+      description: Bad Request
+      properties:
+        message:
+          type: string
+          example: 요청 값이 잘못되었습니다
+        result:
+          type: object
+          
+    Unauthorized:
+      type: object
+      description: Unauthorized
+      properties:
+        message:
+          type: string
+          example: 토큰값이 없습니다
+        result:
+          type: object
+    
+    Forbidden:
+      type: object
+      description: Forbidden
+      properties:
+        message:
+          type: string
+          example: 권한이 없습니다.
+        result:
+          type: object
+    
+        
+    200:
+      type: object
+      description: 'OK'
+      properties:
+        message:
+          type: string
+        result:
+          type: object
+          
+    201:
+      type: object
+      description: 'Created'
+      properties:
+        message:
+          type: string
+          example: 회원가입이 되었습니다 / 스케쥴 등록이 되었습니다 / ...
+        result:
+          type: object
+    
+    400:
+      type: object
+      description: 'Bad Request'
+      properties:
+        message:
+          type: string
+          example: 요청 값이 잘못되었습니다
+        result:
+          type: object
+          
+    401:
+      type: object
+      description: 'Unauthorized'
+      properties:
+        message:
+          type: string
+          example: 토큰값이 없습니다
+        result:
+          type: object
+    
+    403:
+      type: object
+      description: 'Forbidden'
+      properties:
+        message:
+          type: string
+          example: 권한이 없습니다.
         result:
           type: object
           
@@ -661,6 +804,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-
-
