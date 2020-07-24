@@ -1,186 +1,178 @@
 openapi: 3.0.0
 
 info:
-  title: Consulting Project 
-  version: 0.0.1
-  description: ''
-
-
+  title: BE-SIMPLE-ORG
+  version: 0.1.0
+  description: 'BE SIMPLE ORG Project API'
+  
+  
 servers:
-  - url: '{protocol}://{domain}/{version}'
-    variables:
-      protocol:
-        enum:
-          - http
-          - https
-        default: http
-      domain:
-        enum:
-          - 127.0.0.1:3000
-          - api.staging.co.kr
-          - api.production.co.kr
-        default: 127.0.0.1:3000
-      version:
-        enum: 
-          - v1
-          - v2
-        default: v1
+- url: '{protocol}://{domain}/{version}'
+  variables:
+    protocol:
+      enum:
+        - http
+        - https
+      default: http
+    domain:
+      enum:
+        - 127.0.0.1:3000
+        - api.staging-domain.co.kr
+        - api.production-domain.co.kr
+      default: 127.0.0.1:3000
+    version:
+      enum: 
+        - v1
+        - v2
+      default: v1
+
 
 tags:
 - name: 'user'
   description: '유저 관련 API'
 - name: 'admin'
   description: '어드민 관련 API'
-- name: 'partners'
+- name: 'partner'
   description: '상담사 관련 API'
 - name: 'keyword'
   description: '키워드 관련 API'
 - name: 'point'
   description: '포인트 관련 API'
-- name: 'schedules'
+- name: 'schedule'
   description: '스케쥴링 관련 API'
-# - name: 'search'
-#   description: '검색 관련 API'
-
-
 
 security: 
-- ApiKeyAuth: []
-# - userApiKeyAuth: []
-# - bearerAuth: []
+- X_API_KEY: []
+
 
 paths:
-  /user/detail:
-    get:
-      tags: 
-      - user
-      summary: '특정 유저 상세정보'
-      description: '1. 유저 마이페이지에서 사용 하고 본인만 보는 것으로 userId는 JWT안에 있는 값으로 만 판별해서 내려줌'
-      # parameters: 
-      # - $ref: '#/components/parameters/userIdParam'
-      security: 
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
-      responses:
-        200:
-          description: 'success'
-          content:
-            application/json:
-              schema:
-                allOf:
-                - $ref: '#/components/schemas/200'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/user'
-        400:
-          $ref: '#/components/responses/badRequest'
-        401:
-          $ref: '#/components/responses/unauthorized'
-        403:
-          $ref: '#/components/responses/forbidden'
-                
   /user/signup:
     post:
       tags: 
       - user
-      summary: '유저 회원가입'
-      requestBody:
-        content:
-          application/json; charset:utf-8:
-            schema:
-              $ref: '#/components/schemas/user'
+      summary: 피상담자 회원가입 API
+      description: 피상담자가 회원가입 시 사용하는 API 입니다.
       security: 
-      - ApiKeyAuth: []
-      responses:
-        201:
-          $ref: '#/components/responses/created'
-        400:
-          $ref: '#/components/responses/badRequest'
-        401:
-          $ref: '#/components/responses/unauthorized'
-                  
-  
-  /user/singin:
-    post:
-      tags: 
-      - user
-      summary: '유저 로그인'
-      description: ' 1. JWT Refresh 관련 정보 확인 필요<br>2. 리턴 값을 어떻게 줄껀지<br>3. SNS 로그인 어떻게 할꺼니 ?'
+      - X_API_KEY: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/userLogin'
+              $ref: '#/components/schemas/user'
+      responses:
+        201:
+          $ref: '#/components/responses/Created'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        
+  /user/signin:
+    post:
+      tags: 
+      - user
+      summary: 피상담자 / 상담사 로그인 API
+      description: 피상담자 / 상담사 로그인 시 사용하는 API 입니다.
       security: 
-      - ApiKeyAuth: []
+      - X_API_KEY: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/signIn'
       responses:
         200:
-          description: 'success'
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+          
+  /user/logout:
+    post:
+      tags: 
+      - user
+      summary: 피상담자 / 상담사 로그아웃 API
+      description: 피상담자 / 상담사 로그아웃 시 사용하는 API 입니다. (해당 API 사용 여부는 불분명)
+      security: 
+      - X_API_KEY: []
+      - X_ACCESS_TOKEN: []
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+          
+          
+  /user/detail:
+    get:
+      tags: 
+      - user
+      summary: 피상담자 상세정보 API
+      description: 피상담자 (본인) 상세정보를 볼 때 사용됩니다. <br> 파라미터 정보가 필요 없는건 x-access-token에서 확인이 가능해서 따로 파라미터를 받지 않습니다.
+      security: 
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
+      responses:
+        200:
+          description: 'Success'
           content:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/200'
+                - $ref: '#/components/schemas/Success'
                 - type: object
                   properties:
                     result:
-                      type: obejct
-                      $ref: '#/components/schemas/LoginResponse'
-        400:
-          $ref: '#/components/responses/badRequest'
-        401:
-          $ref: '#/components/responses/unauthorized'
+                      type: object
+                      properties:
+                        user:
+                          type: object
+                          $ref: '#/components/schemas/user'
           
-  /user/signout:
-    post:
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+          
+  /user/email/validate:
+    get:
       tags: 
       - user
-      summary: '유저 로그아웃'
+      summary: 피상담자 / 상담사 이메일 중복 확인 API
       security: 
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
+      - X_API_KEY: []
+      parameters: 
+      - $ref: '#/components/parameters/emailQueryParam'
       responses:
         200:
-          $ref: '#/components/responses/success'
+          $ref: '#/components/responses/Success'
         400:
-          $ref: '#/components/responses/badRequest'
-  
-  /user/email/check:
-    get:
-     tags: 
-     - user
-     summary: '유저 이메일 중복 확인'
-     security: 
-     - ApiKeyAuth: []
-     parameters: 
-     - $ref: '#/components/parameters/emailParam'
-     responses:
-      200:
-         $ref: '#/components/responses/success'
-      400:
-          $ref: '#/components/responses/badRequest'
-      401:
-        $ref: '#/components/responses/unauthorized'
-  
-  
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+          
   /admin/users:
     get:
       tags: 
       - admin
-      summary: '어드민에서 유저 정보 조회 리스트'
-      description: ''
+      summary: 어드민에서 피상담자 정보 리스트업 API
+      security: 
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
       parameters: 
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/sizeparam'
+      - $ref: '#/components/parameters/pageQueryParam'
+      - $ref: '#/components/parameters/sizeQueryParam'
       responses:
         200:
-          description: 'success'
+          description: 'Success'
           content:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/200'
+                - $ref: '#/components/schemas/Success'
                 - type: object
                   properties:
                     result:
@@ -190,29 +182,35 @@ paths:
                           type: array
                           items:
                             $ref: '#/components/schemas/user'
-                        totalCount:
-                          type: integer
+                
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
           
-      
-      
-  /admin/partners:
+  /admin/partner:
     get:
-      tags:
+      tags: 
       - admin
-      summary: '어드민에서 상담사 조회'
-      description: 퍼블릭에서도 사용가능하고 프라이빗에서도 사용가능한 하나의 API를 만들까 ? 아니면 따로따로 구현할까?
+      summary: 어드민에서 상담사 정보 리스트업 API
+      security: 
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
       parameters: 
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/sizeparam'
-      - $ref: '#/components/parameters/evaluateParam'
+      - $ref: '#/components/parameters/pageQueryParam'
+      - $ref: '#/components/parameters/sizeQueryParam'
+      - $ref: '#/components/parameters/evaluateQueryParam'
       responses:
         200:
-          description: 'success'
+          description: 'Success'
           content:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/200'
+                - $ref: '#/components/schemas/Success'
                 - type: object
                   properties:
                     result:
@@ -224,68 +222,62 @@ paths:
                             $ref: '#/components/schemas/partnerDetail'
                         totalCount:
                           type: integer
+                          example: 10
         400:
-          $ref: '#/components/responses/badRequest'
+          $ref: '#/components/responses/BadRequest'
         401:
-          $ref: '#/components/responses/unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         403:
-          $ref: '#/components/responses/unauthorized'
-                          
-  /admin/partners/{partnersId}:
+          $ref: '#/components/responses/Forbidden'
+          
+  /admin/partner/{partnerId}:
     put:
       tags: 
       - admin
-      summary: '어드민에서 파트너 정보 업데이트 시켜 줄때 사용 '
+      summary: 어드민에서 상담사 정보 업데이트 API
+      security: 
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
       parameters: 
-      - $ref: '#/components/parameters/partnersIdParam'
+      - $ref: '#/components/parameters/partnerIdPathParam'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/partnerDetail'
       responses:
-        200:
-          $ref: '#/components/responses/success'
+        201:
+          $ref: '#/components/responses/Updated'
         400:
-          $ref: '#/components/responses/badRequest'
+          $ref: '#/components/responses/BadRequest'
         401:
-          $ref: '#/components/responses/unauthorized'
+          $ref: '#/components/responses/Unauthorized'
         403:
-          $ref: '#/components/responses/unauthorized'
-
-  /partners/signup:
-    post:
-      tags:
-      - partners
-      summary: '상담사 회원가입'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/partnerLogin'
-      responses:
-        200:
-         $ref: '#/components/responses/success'
-  /partners:
+          $ref: '#/components/responses/Forbidden'
+        
+  /partner:
     get:
-      tags:
-      - partners
-      summary: '상담사 조회'
+      tags: 
+      - partner
+      summary: 상담사 정보 리스트업 API
+      security: 
+      - X_API_KEY: []
       parameters: 
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/sizeparam'
-      - $ref: '#/components/parameters/keywordParam'
-      - $ref: '#/components/parameters/levelParam'
-      - $ref: '#/components/parameters/genderParam'
-      - $ref: '#/components/parameters/certificateParam'
+      - $ref: '#/components/parameters/pageQueryParam'
+      - $ref: '#/components/parameters/sizeQueryParam'
+      - $ref: '#/components/parameters/genderQueryParam'
+      - $ref: '#/components/parameters/levelQueryParam'
+      - $ref: '#/components/parameters/certificateQueryParam'
+      - $ref: '#/components/parameters/keywordQueryParam'
       responses:
         200:
-          description: 'success'
+          description: 'Success'
           content:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/200'
+                - $ref: '#/components/schemas/Success'
                 - type: object
                   properties:
                     result:
@@ -297,163 +289,294 @@ paths:
                             $ref: '#/components/schemas/partnerDetail'
                         totalCount:
                           type: integer
-                
-  /keywords:
+                          example: 10
+        401:
+          $ref: '#/components/responses/Unauthorized'
+          
+  /partner/signup:
+    post:
+      tags: 
+      - partner
+      summary: 상담사 회원 가입 API
+      security: 
+      - X_API_KEY: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/partner'
+      responses:
+        201:
+          $ref: '#/components/responses/Created'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+  
+  /keyword:
     get:
       tags: 
       - keyword
-      summary: '키워드 정보'
+      summary: 키워드 정보 리스트 업 API
       security: 
-      - ApiKeyAuth: []
+      - X_API_KEY: []
       responses:
         200:
-          description: 'success'
+          description: 'Success'
           content:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/200'
+                - $ref: '#/components/schemas/Success'
                 - type: object
                   properties:
                     result:
-                      $ref: '#/components/schemas/keywords'
+                      type: object
+                      $ref: '#/components/schemas/keyword'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
   
   /point/charge:
     post:
       tags: 
       - point
-      summary: 카카오 결제 후 포인트 입력
-      description: 카카오 결제 후 포인트 DB로 입력하는 API
+      summary: 결제 후 포인트 충전 API
       security: 
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/pointCharge'
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
       responses:
         200:
-         $ref: '#/components/responses/success'
-  
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+      
   /point/send:
     post:
-      tags:
+      tags: 
       - point
-      summary: 유저가 상담권 구매 시 사용 
-      description: 유저가 상담권 구매 시
+      summary: 피상담자가 상담사의 상담권 구매시 사용 API
       security: 
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  
+  /schedule/user:
+    post:
+      tags: 
+      - schedule
+      summary: 피상담자가 상담사의 상담 스케쥴 확정 API
+      security: 
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/pointSend'
+              $ref: '#/components/schemas/userSchedule'
       responses:
         200:
-         $ref: '#/components/responses/success'
-                
-  /schedules/partners/{partnersId}:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+          
+  /schedule/partner:
+    post:
+      tags: 
+      - schedule
+      summary: 상담사가 본인의 상담 스케쥴 등록 API
+      security: 
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/partnerSchedule'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+          
+  /schedule/schedule/{partnerId}:
     get:
       tags: 
-      - schedules
-      summary: '상담사 스케쥴 일정 정보 가져오는 API'
-      description: 'patnersId? email?<br> startedAt 30분 단위로 하냐 / Range로 하냐 ?<br> 금일 00시 이후 스케쥴만 보여줘 ? 어떻게해 ? 정해줘 제발'
+      - schedule
       parameters: 
-      - $ref: '#/components/parameters/partnersIdParam'
-      - $ref: '#/components/parameters/dateParam'
+      - $ref: '#/components/parameters/partnerIdPathParam'
+      summary: 상담사의 스케쥴 정보 리스트업 API
       security: 
-      - ApiKeyAuth: []
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
       responses:
         200:
-          description: 'success'
+          description: 'Success'
           content:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/200'
+                - $ref: '#/components/schemas/Success'
                 - type: object
                   properties:
                     result:
-                      $ref: '#/components/schemas/schedules'
+                      type: object
+                      properties:
+                        schedules:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/schedule'
+                      
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
 
-  /schedules/partners:
-    post:
-      tags: 
-      - schedules
-      summary: '스케쥴 일정 생성 API'
-      security: 
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/schedulesObject'
-      responses:
-        200:
-         $ref: '#/components/responses/success'
-  
-  /schedules/user:
-    post:
-      tags: 
-      - schedules
-      summary: '유저 스케쥴 확정 API'
-      description: '수정 절대 불가 절대 못 바꿔 진짜다 안된다 경고창 띄워주세요 '
-      security: 
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-              - $ref: '#/components/schemas/schedulesObject'
-      responses:
-        200:
-         $ref: '#/components/responses/success'
+
 
 components:
   responses:
-    success:
-      description: 'success'
+    Success:
+      description: Success
       content:
         application/json:
           schema:
-            oneOf:
-            - $ref: '#/components/schemas/200'
-            - $ref: '#/components/schemas/201'
-            - $ref: '#/components/schemas/400'
-    created:
-      description: 'Created'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/201'
-    badRequest:
-      description: 'Bad Request'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/400'
-    
-    unauthorized:
-      description: 'Unauthorized'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/401'
-    
-    forbidden:
-      description: 'Forbidden'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/403'
+            type: object
+            properties:
+              message:
+                type: string
+                example: success
+              result:
+                type: object 
                 
+    Created:
+      description: Created Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Created Success
+              result:
+                type: object
+                
+    Updated:
+      description: Updated Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Updated Success
+              result:
+                type: object
+                
+    Empty:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Empty Object
+              result:
+                type: object
+                
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Bad Request
+              result:
+                type: object
+                
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Unauthorized
+              result:
+                type: object
+                
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Forbidden
+              result:
+                type: object
       
+              
   schemas:
+    Success:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Success'
+        result:
+          type: object
+  
+  
+    signIn:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          example: Passw@rd
+    
     user:
       type: object
       properties:
@@ -462,409 +585,284 @@ components:
           format: email
         password:
           type: string
-          writeOnly: True
+          example: Passw@rd
+          writeOnly: true
         name:
           type: string
-        age:
-          type: integer
+          example: 김모씨
         gender:
           type: integer
-          example: '1 (남자: 1, 여자: 2)'
-    
-    userLogin:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        passowrd:
-          type: string
-          
-    partnerLogin:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          writeOnly: True
-        name:
-          type: string
-          example: 김아무개
-        phoneNumber:
-          type: string
-          example: 01012345678
+          example: 1
         age:
           type: integer
           example: 27
-        gender:
-          type: integer
-          example: '1 (남자: 1, 여자: 2)'
-
-    partners:
+      required: 
+      - email
+      - password
+      - name
+      - gender
+      - age
+            
+          
+    partner:
       type: object
       properties:
-        partnerId:
-          type: integer
-          example: 1
         email:
           type: string
           format: email
         password:
           type: string
-          writeOnly: True
+          example: Passw@rd
+          writeOnly: true
         name:
           type: string
+          example: 김모씨
+        phoneNumber:
+          type: string
+          example: 01012345678
         gender:
           type: integer
-          example: '1 (남자: 1, 여자: 2)'
+          example: 1
+        age:
+          type: integer
+          example: 27
+      required: 
+      - email
+      - password
+      - name
+      - phoneNumber
+      - gender
+      - age
           
     partnerDetail:
       type: object
       properties:
-        url:
-          description: 유튜브 url
-          type: string
-          example: www.youtube.com
-        shortInfo:
-          description: 한줄 소개
-          type: string
-          example: 간략 소개 입니다.
-        career:
-          description: 경력
-          type: string
-          example: 내가 말이야 어디서 뭐했고 어디서 뭐했어
-        info:
-          description: 긴 소개글
-          type: string
-          example: 이건 긴 소개글 입니다.
-        chatCost:
-          description: 채팅 상담 비용
+        id:
           type: integer
-          example: 30000
+          example: 1
+          readOnly: true
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          example: Passw@rd
+          writeOnly: true
+        name:
+          type: string
+          example: 김모씨
         phoneNumber:
           type: string
+          example: 01012345678
+        gender:
+          type: integer
+          example: 1
+        age:
+          type: integer
+          example: 27
+        url:
+          type: string
+          description: youtube url
+        shortInfo:
+          type: string
+          description: 짧은 소개 글
+          example: 당신의 지치고 힘든 마음을 치료해드려용
+        career:
+          type: string
+          example: 마 내가 어디서 뭐했고 어디서 뭐했어 
+        info:
+          type: string
+          description: 긴 소개 글
+          example: 내 소개가 말이야 이러쿵 저러쿵 요로콤 저러콤
+        chatCost:
+          type: integer
+          description: 채팅 시 가격
+          example: 30000
         keyword:
-          description: 상담사 키워드
           type: string
-          example: 우울
-        certificate:
-          description: 자격증 급수
-          type: integer
-          example: '1 (1급: 1, 2급: 2, 3급: 3)'
+          example: 불안
         level:
-          description: 상담사 레벨
           type: integer
-          example: '1 (Master: 1, Export: 2, Normal: 3)'
+          description: '상담사의 레벨 (1: Master, 2: Export, 3: Normal)'
+          example: 1
+        certificate:
+          type: integer
+          description: '상담사 자격증 (1: 1급, 2: 2급, 3: 무급)'
+          example: 1
         image:
-          description: S3 이미지 path
           type: string
-
-    schedulesObject:
+        evaluate:
+          type: string
+          description: '상담사 검증 여부 검색 (True: 검증된 사람, False: 검증 안된사람)'
+          example: true
+          writeOnly: true
+          
+    schedule:
       type: object
       properties:
-        partnersId:
-          type: integer
-          example: 1000004
         scheduleId:
           type: integer
           example: 1
-    
-    schedules:
+        reservation:
+          type: boolean
+          example: true
+        startedAt:
+          type: string
+          example: '2020-07-25 12:00:00'
+          
+    userSchedule:
       type: object
+      properties:
+        partnerId:
+          type: integer
+          example: 1
+        scheduleId:
+          type: integer
+          example: 12
+          
+    partnerSchedule:
       properties:
         schedules:
           type: array
           items:
-            type: object
-            properties:
-              scheduleId: 
-                type: integer
-                example: 1
-              reservation:
-                type: boolean
-              startedAt:
-                type: string
-                example: '2020-07-02 12:00:00'
-              endedAt:
-                type: string
-                example: '2020-07-02 12:30:00'
+            type: string
+          example: ['2020-07-25 12:00:00', '2020-07-25 12:30:00', '2020-07-25 13:00:00']
     
-    pointCharge:
+    keyword:
       type: object
       properties:
-        userId:
-          type: integer
-        point:
-          type: integer
-          
-    pointSend:
-      type: object
-      properties:
-        userId:
-          type: integer
-        partnerId:
-          type: integer
-        point:
-          type: integer
-
-    keywords:
-      type: object
-      properties:
-        keywords:
+        keyword:
           type: array
           items:
             type: string
-          example: ['우울', '행복']
-    
-    LoginResponse:
-      type: object
-      properties:
-        accessToken:
-          type: string
-        refreshToken:
-          type: string
-      
-    
-    
-    Success:
-      type: object
-      description: OK
-      properties:
-        message:
-          type: string
-        result:
-          type: object
-          
-    Created:
-      type: object
-      description: Created
-      properties:
-        message:
-          type: string
-          example: 요청에의해 리소스가 생성되었습니다 (회원가입 / 스케쥴 생성)
-        result:
-          type: object
-          
-    Updated:
-      type: object
-      description: Updated
-      properties:
-        message:
-          type: string
-          example: 
-        result:
-          type: object
-          
-    Empty:
-      type: object
-      description: Empty
-      properties:
-        message:
-          type: string
-          example: 
-        result:
-          type: object
-    
-    BadRequest:
-      type: object
-      description: Bad Request
-      properties:
-        message:
-          type: string
-          example: 요청 값이 잘못되었습니다
-        result:
-          type: object
-          
-    Unauthorized:
-      type: object
-      description: Unauthorized
-      properties:
-        message:
-          type: string
-          example: 토큰값이 없습니다
-        result:
-          type: object
-    
-    Forbidden:
-      type: object
-      description: Forbidden
-      properties:
-        message:
-          type: string
-          example: 권한이 없습니다.
-        result:
-          type: object
-    
-        
-    200:
-      type: object
-      description: 'OK'
-      properties:
-        message:
-          type: string
-        result:
-          type: object
-          
-    201:
-      type: object
-      description: 'Created'
-      properties:
-        message:
-          type: string
-          example: 회원가입이 되었습니다 / 스케쥴 등록이 되었습니다 / ...
-        result:
-          type: object
-    
-    400:
-      type: object
-      description: 'Bad Request'
-      properties:
-        message:
-          type: string
-          example: 요청 값이 잘못되었습니다
-        result:
-          type: object
-          
-    401:
-      type: object
-      description: 'Unauthorized'
-      properties:
-        message:
-          type: string
-          example: 토큰값이 없습니다
-        result:
-          type: object
-    
-    403:
-      type: object
-      description: 'Forbidden'
-      properties:
-        message:
-          type: string
-          example: 권한이 없습니다.
-        result:
-          type: object
-          
+          example: [우울, 저울, 행복, 연복]
+  
+  
   parameters:
-    evaluateParam:
-      in: query
-      name: evaluate
-      description: (심사 중인 데이터, 아닌 데이터 정하기)
-      schema:
-        type: boolean
-    dateParam:
-      in: query
-      name: date
-      description: 날짜
-      schema:
-        type: string
-        format: date
-        
-    partnersIdParam:
+    partnerIdPathParam:
       in: path
-      name: partnersId
-      description: 상담사 ID (=userId)
-      required: true 
+      name: partnerId
+      required: true
       schema:
         type: integer
+        example: 10
         
-    userIdParam:
-      in: path
-      name: userId
-      description: 유저 ID
-      required: true 
-      schema:
-        type: integer
-      
-    emailParam:
-      in: query
-      name: email
-      description: 이메일
-      schema:
-        type: string
-        format: email
-        
-    pageParam:
+    pageQueryParam:
       in: query
       name: page
-      description: 페이지
       schema:
         type: integer
         example: 1
-      # required: True
-      
-    sizeparam:
+        
+    sizeQueryParam:
       in: query
       name: size
-      description: 페이지 당 사이즈
       schema:
         type: integer
         example: 15
-      # required: True
-      
-    keywordParam:
+        
+    emailQueryParam:
+      in: query
+      name: email
+      required: true
+      schema:
+        type: string
+        example: example@email.com
+
+    evaluateQueryParam:
+      in: query
+      name: evaluate
+      description: '상담사 검증 여부 검색 (True: 검증된 사람, False: 검증 안된사람)'
+      schema:
+        type: boolean
+        example: true
+    
+    genderQueryParam:
+      in: query
+      name: gender
+      description: '성별 (1: 남자 2: 여자)'
+      schema:
+        type: integer
+        example: 1
+        
+    levelQueryParam:
+      in: query
+      name: level
+      description: '상담사의 레벨 (1: Master, 2: Export, 3: Normal)'
+      schema:
+        type: integer
+        example: 1
+        
+    certificateQueryParam:
+      in: query
+      name: certificate
+      description: '상담사 자격증 (1: 1급, 2: 2급, 3: 무급)'
+      schema:
+        type: integer
+        example: 1
+        
+    keywordQueryParam:
       in: query
       name: keyword
       description: 키워드
       schema:
         type: string
-        example: 강박
+        example: 불안
     
-    levelParam:
-      in: query
-      name: level
-      description: 상담사 레벨 
-      schema:
-        type: integer
-        example: 1
     
-    genderParam:
-      in: query
-      name: gender
-      description: 상담사 성별
-      schema:
-        type: integer
-        example: 1
-      
-    certificateParam:
-      in: query
-      name: certificate
-      description: 상담사 자격증
-      schema:
-        type: integer
-        example: 1
-        
-    scheduleIdParam:
-      in: query
-      name: scheduleId
-      required: true
-      schema:
-        type: array
-        items:
-          type: string
-          format: multi
-      
     
-      
+  
   securitySchemes:
-    ApiKeyAuth:
+    X_API_KEY:
       in: header
       type: apiKey
-      name: 'x-api-key'
+      name: x-api-key
+    X_API_USER_ID:
+      in: header
+      type: apiKey
+      name: x-api-userId
+    X_ACCESS_TOKEN:
+      in: header
+      type: apiKey
+      name: x-access-token
       
-    userApiKeyAuth:
-      in: header
-      type: apiKey
-      name: 'x-api-userId'
       
-    AccessTokenAuth:
-      in: header
-      type: apiKey
-      name: 'x-api-accessToken'
-    
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
