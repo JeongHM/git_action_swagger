@@ -347,6 +347,11 @@ paths:
       - X_API_KEY: []
       - X_API_USER_ID: []
       - X_ACCESS_TOKEN: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pointCharge'
       responses:
         200:
           $ref: '#/components/responses/Success'
@@ -366,6 +371,11 @@ paths:
       - X_API_KEY: []
       - X_API_USER_ID: []
       - X_ACCESS_TOKEN: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pointSend'
       responses:
         200:
           $ref: '#/components/responses/Success'
@@ -736,7 +746,29 @@ components:
           items:
             type: string
           example: [우울, 저울, 행복, 연복]
-  
+          
+    pointCharge:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        point:
+          type: integer
+          example: 30000
+          
+    pointSend:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        point:
+          type: integer
+          example: 30000
+        partnerId:
+          type: integer
+          example: 1
   
   parameters:
     partnerIdPathParam:
