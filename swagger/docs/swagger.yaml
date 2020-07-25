@@ -40,6 +40,8 @@ tags:
   description: '포인트 관련 API'
 - name: 'schedule'
   description: '스케쥴링 관련 API'
+- name: 'token'
+  description: 'JWT 토큰 관련 API'
 
 security: 
 - X_API_KEY: []
@@ -82,13 +84,26 @@ paths:
               $ref: '#/components/schemas/signIn'
       responses:
         200:
-          $ref: '#/components/responses/Success'
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Success'
+                - type: object
+                  properties:
+                    result:
+                      type: object
+                      properties:
+                        token:
+                          $ref: '#/components/schemas/token'
+                
         400:
           $ref: '#/components/responses/BadRequest'
         401:
           $ref: '#/components/responses/Unauthorized'
           
-  /user/logout:
+  /user/signout:
     post:
       tags: 
       - user
@@ -292,7 +307,7 @@ paths:
                           example: 10
         401:
           $ref: '#/components/responses/Unauthorized'
-          
+        
   /partner/signup:
     post:
       tags: 
@@ -312,6 +327,29 @@ paths:
           $ref: '#/components/responses/BadRequest'
         401:
           $ref: '#/components/responses/Unauthorized'
+  
+  /partner/detail/{partnerId}:
+    get:
+      tags: 
+      - partner
+      summary: 상담사의 상세정보 API
+      parameters: 
+      - $ref: '#/components/parameters/partnerIdPathParam'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Success'
+                - type: object
+                  properties:
+                    result:
+                      type: object
+                      properties:
+                        partner:
+                          $ref: '#/components/schemas/partnerDetail'
   
   /keyword:
     get:
@@ -469,6 +507,43 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         403:
           $ref: '#/components/responses/Forbidden'
+  
+  /token/refresh:
+    post:
+      tags:
+      - token
+      summary: 토큰 리프레쉬
+      security: 
+      - X_API_KEY: []
+      - X_API_USER_ID: []
+      - X_ACCESS_TOKEN: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/refreshToken'
+              
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Success'
+                - type: object
+                  properties:
+                    result:
+                      type: object
+                      properties:
+                        token:
+                          $ref: '#/components/schemas/token'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
 
 
 
@@ -535,7 +610,7 @@ components:
             properties:
               message:
                 type: string
-                example: Bad Request
+                example: Bad Request / 잘못된 요청입니다.
               result:
                 type: object
                 
@@ -548,7 +623,7 @@ components:
             properties:
               message:
                 type: string
-                example: Unauthorized
+                example: Unauthorized / x-access-token (없음, 만료, 검증 실패) 되었습니다.
               result:
                 type: object
                 
@@ -561,7 +636,7 @@ components:
             properties:
               message:
                 type: string
-                example: Forbidden
+                example: Forbidden / x-access-token 권한이 없습니다.
               result:
                 type: object
       
@@ -769,6 +844,19 @@ components:
         partnerId:
           type: integer
           example: 1
+    token:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+          
+    refreshToken:
+      type: object
+      properties:
+        refreshToken:
+          type: string
   
   parameters:
     partnerIdPathParam:
