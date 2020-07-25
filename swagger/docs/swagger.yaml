@@ -550,7 +550,7 @@ paths:
 components:
   responses:
     Success:
-      description: Success
+      description: Success / 요청이 성공하였습니다.
       content:
         application/json:
           schema:
@@ -563,7 +563,7 @@ components:
                 type: object 
                 
     Created:
-      description: Created Success
+      description: Created Success / 요청이 성공하였으며, 새로운 리소스가 생성되었습니다.
       content:
         application/json:
           schema:
@@ -576,7 +576,7 @@ components:
                 type: object
                 
     Updated:
-      description: Updated Success
+      description: Updated Success / 요청이 성공하였으며, 리소스의 수정이 반영되었습니다.
       content:
         application/json:
           schema:
@@ -589,7 +589,7 @@ components:
                 type: object
                 
     Empty:
-      description: Success
+      description: Success / 요청이 성공하였지만 해당 데이터가 존재하지 않습니다.
       content:
         application/json:
           schema:
@@ -602,7 +602,7 @@ components:
                 type: object
                 
     BadRequest:
-      description: Bad Request
+      description: Bad Request / 잘못된 요청입니다. 요청 파라미터를 확인 하시기 바랍니다.
       content:
         application/json:
           schema:
@@ -610,12 +610,12 @@ components:
             properties:
               message:
                 type: string
-                example: Bad Request / 잘못된 요청입니다.
+                example: Bad Request
               result:
                 type: object
                 
     Unauthorized:
-      description: Unauthorized
+      description: Unauthorized / x-access-token 내 문제가 있는 경우 반환 합니다. (만료, 검증 실패, 헤더에 값이 없거나)
       content:
         application/json:
           schema:
@@ -623,12 +623,12 @@ components:
             properties:
               message:
                 type: string
-                example: Unauthorized / x-access-token (없음, 만료, 검증 실패) 되었습니다.
+                example: Unauthorized
               result:
                 type: object
                 
     Forbidden:
-      description: Forbidden
+      description: Forbidden  / x-access-token 권한이 없습니다.
       content:
         application/json:
           schema:
@@ -636,7 +636,7 @@ components:
             properties:
               message:
                 type: string
-                example: Forbidden / x-access-token 권한이 없습니다.
+                example: Forbidden
               result:
                 type: object
       
