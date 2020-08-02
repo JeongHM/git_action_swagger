@@ -104,7 +104,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
           
   /user/signout:
-    post:
+    delete:
       tags: 
       - user
       summary: 피상담자 / 상담사 로그아웃 API
@@ -205,7 +205,7 @@ paths:
         403:
           $ref: '#/components/responses/Forbidden'
           
-  /admin/partner:
+  /admin/partners:
     get:
       tags: 
       - admin
@@ -639,6 +639,20 @@ components:
                 example: Forbidden
               result:
                 type: object
+                
+    ResourceConflict:
+      description: ResourceConflict / 리소스가 이미 존재하여 해당 리소스를 사용하지 못합니다. (예를들어 /user/email/validate -> 409 = 이메일이 이미 등록 되어있는 경우)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: ResourceConflict - 이미 존재하는 데이터 입닙다.
+              result:
+                type: object
+                
       
               
   schemas:
@@ -687,6 +701,10 @@ components:
       - name
       - gender
       - age
+    
+    userDetail:
+      type: object
+      
             
           
     partner:
