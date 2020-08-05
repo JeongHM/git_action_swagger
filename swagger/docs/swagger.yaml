@@ -6,7 +6,7 @@ info:
   description: "BE SIMPLE ORG Project API"
 
 servers:
-  - url: "{protocol}://{domain}/{version}"
+  - url: "{protocol}://{domain}/api/{version}"
     variables:
       protocol:
         enum:
@@ -344,6 +344,8 @@ paths:
                         properties:
                           partner:
                             $ref: "#/components/schemas/partnerDetail"
+        401:
+          $ref: "#/components/responses/Unauthorized"
 
   /keyword:
     get:
@@ -596,7 +598,7 @@ components:
                 type: object
 
     Unauthorized:
-      description: Unauthorized / x-access-token 내 문제가 있는 경우 반환 합니다. (만료, 검증 실패, 헤더에 값이 없거나)
+      description: Unauthorized / Headaer 내 x-api-key 가 없거나, x-api-key 값이 다른 경우 입니다.
       content:
         application/json:
           schema:
@@ -609,7 +611,7 @@ components:
                 type: object
 
     Forbidden:
-      description: Forbidden  / x-access-token 권한이 없습니다.
+      description: Forbidden / Header 내 x-access-token 이 없거나, x-access-token 값이 잘못되거나, 권한이 없는 경우 입니다.
       content:
         application/json:
           schema:
