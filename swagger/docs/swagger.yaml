@@ -162,6 +162,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         401:
           $ref: "#/components/responses/Unauthorized"
+        409:
+          $ref: "#/components/responses/ResourceConflict"
 
   /admin/users:
     get:
@@ -194,6 +196,8 @@ paths:
                           totalCount:
                             type: integer
 
+        204:
+          $ref: "#/components/responses/Empty"
         400:
           $ref: "#/components/responses/BadRequest"
         401:
@@ -233,6 +237,8 @@ paths:
                           totalCount:
                             type: integer
                             example: 10
+        204:
+          $ref: "#/components/responses/Empty"
         400:
           $ref: "#/components/responses/BadRequest"
         401:
@@ -299,6 +305,8 @@ paths:
                           totalCount:
                             type: integer
                             example: 10
+        204:
+          $ref: "#/components/responses/Empty"
         401:
           $ref: "#/components/responses/Unauthorized"
 
@@ -344,6 +352,8 @@ paths:
                         properties:
                           partner:
                             $ref: "#/components/schemas/partnerDetail"
+        204:
+          $ref: "#/components/responses/Empty"
         401:
           $ref: "#/components/responses/Unauthorized"
 
@@ -598,7 +608,7 @@ components:
                 type: object
 
     Unauthorized:
-      description: Unauthorized / Headaer 내 x-api-key 가 없거나, x-api-key 값이 다른 경우 입니다.
+      description: Unauthorized / 인증(Token) 에 문제가 있는 경우 입니다.
       content:
         application/json:
           schema:
@@ -611,7 +621,7 @@ components:
                 type: object
 
     Forbidden:
-      description: Forbidden / Header 내 x-access-token 이 없거나, x-access-token 값이 잘못되거나, 권한이 없는 경우 입니다.
+      description: Forbidden / 권한 (API KEY) 에 문제가 있는 경우 입니다.
       content:
         application/json:
           schema:
